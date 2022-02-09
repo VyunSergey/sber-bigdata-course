@@ -82,3 +82,8 @@ project/target/
 .cache/
 .lib/
 .bsp/
+/src/main/resources/data/stage/src/*
+/src/main/resources/data/stage/tgt/*
+/src/main/resources/data/datamart/src/*
+/src/main/resources/data/datamart/tgt/*
+/spark-warehouse
