@@ -31,17 +31,20 @@ trait SparkApp extends Logging {
    *
    * */
   def count(start: Date = minStart, end: Date = maxEnd)(implicit spark: SparkSession): Long = {
-    (Try {
+    val count: Long = (Try {
       get()
     } getOrElse {
       gen(start, end)
     }).count()
+
+    logInfo(s"Successfully counted rows in data $name count=$count")
+    count
   }
 
   /*
    *
    * */
-  def show(start: Date = minStart, end: Date = maxEnd, lines: Int = 20, truncate: Boolean = true)(implicit spark: SparkSession): Unit = {
+  def show(start: Date = minStart, end: Date = maxEnd, lines: Int = 20, truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
     (Try {
       get()
     } getOrElse {

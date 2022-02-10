@@ -23,9 +23,11 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   banner(s"""\nДобро пожаловать на курс BigData со Spark!
            |Надеюсь, Вам понравится, удачи!
-           |\nЗапуск: --data=<Название датасета> --start-date=<Дата начала> --end-date=<Дата конца> --mode=<Режим расчета>
-           |Пример: --data=sales_points --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
+           |\nЗапуск: --data=<Название датасета> [--c] [--s] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
+           |Пример: --data=sales_points --c --s --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
            |  параметр --data необходимо указывать обязательно
+           |  параметр --count можно не указывать, тогда возьмется значение 'false'
+           |  параметр --show можно не указывать, тогда возьмется значение 'false'
            |  параметр --start-date можно не указывать, тогда возьмется значение '1900-01-01'
            |  параметр --end-date можно не указывать, тогда возьмется значение '5999-12-31'
            |  параметр --mode можно не указывать, тогда возьмется значение 'Overwrite'
@@ -43,6 +45,22 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
     descr = s"Название датасета, поддерживаются: ${supportedData.mkString(", ")}",
     required = true,
     validate = supportedData.contains
+  )
+
+  val countFlg: ScallopOption[Boolean] = toggle(
+    name = "count",
+    short = 'c',
+    descrYes = "Флаг подсчета количества строк в датасете",
+    required = false,
+    default = Some(false)
+  )
+
+  val showFlg: ScallopOption[Boolean] = toggle(
+    name = "show",
+    short = 's',
+    descrYes = "Флаг вывода в консоль примера данных в датасете",
+    required = false,
+    default = Some(false)
   )
 
   val startDate: ScallopOption[Date] = opt[String](
