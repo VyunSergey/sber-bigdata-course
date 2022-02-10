@@ -1,7 +1,8 @@
 package ru.sberbank.bigdata.study.course.sales.common
 
 import org.apache.spark.sql.SaveMode
-import org.rogach.scallop.{ScallopConf, ScallopOption}
+import org.rogach.scallop.exceptions.{Help, Version}
+import org.rogach.scallop.{Compat, ScallopConf, ScallopOption}
 
 import java.sql.Date
 import scala.util.Try
@@ -24,7 +25,7 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
   banner(s"""\nДобро пожаловать на курс BigData со Spark!
            |Надеюсь, Вам понравится, удачи!
            |\nЗапуск: --data=<Название датасета> [--c] [--s] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
-           |Пример: --data=sales_points --c --s --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
+           |Пример: --data=transactions --c --s --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
            |  параметр --data необходимо указывать обязательно
            |  параметр --count можно не указывать, тогда возьмется значение 'false'
            |  параметр --show можно не указывать, тогда возьмется значение 'false'
@@ -35,9 +36,16 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
            |""".stripMargin)
   footer("\nЕсли возникли проблемы или вопросы, обращайтесь по каналам связи")
 
-  override def onError(e: Throwable): Unit = {
-    builder.printHelp()
-    super.onError(e)
+  override def onError(e: Throwable): Unit = e match {
+    case _: Help =>
+      builder.printHelp()
+      Compat.exit(0)
+    case Version =>
+      builder.vers.foreach(println)
+      Compat.exit(0)
+    case _ =>
+      builder.printHelp()
+      super.onError(e)
   }
 
   val data: ScallopOption[String] = opt[String](
