@@ -12,7 +12,7 @@ import java.sql.Date
 
 object SalesPoints extends SparkApp {
   override val name: String = "sales_points"
-  override val partitionColumnNames: Seq[String] = Seq("date")
+  override val partitionColName: Option[String] = Some("date")
 
   /*
    *

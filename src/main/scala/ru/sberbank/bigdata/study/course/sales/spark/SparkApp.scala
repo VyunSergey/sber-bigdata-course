@@ -1,6 +1,7 @@
 package ru.sberbank.bigdata.study.course.sales.spark
 
 import org.apache.spark.internal.Logging
+import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SaveMode, SparkSession}
 import ru.sberbank.bigdata.study.course.sales.common.Configuration
 
@@ -17,7 +18,7 @@ trait SparkApp extends Logging {
   /*
    *
    * */
-  val partitionColumnNames: Seq[String] = Nil
+  val partitionColName: Option[String] = None
 
   /*
    *
@@ -31,13 +32,17 @@ trait SparkApp extends Logging {
    *
    * */
   def count(start: Date = minStart, end: Date = maxEnd)(implicit spark: SparkSession): Long = {
-    val count: Long = (Try {
+    val dataFrame: DataFrame = Try {
       get()
     } getOrElse {
       gen(start, end)
-    }).count()
+    }
 
-    logInfo(s"Successfully counted rows in data $name count=$count")
+    val count: Long = partitionColName.map { name =>
+      dataFrame.filter(col(name).between(start, end)).count
+    }.getOrElse(dataFrame.count)
+
+    println(prettyInfo(s"Successfully counted rows in data $name count=$count"))
     count
   }
 
@@ -45,11 +50,15 @@ trait SparkApp extends Logging {
    *
    * */
   def show(start: Date = minStart, end: Date = maxEnd, lines: Int = 20, truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
-    (Try {
+    val dataFrame: DataFrame = Try {
       get()
     } getOrElse {
       gen(start, end)
-    }).show(lines, truncate)
+    }
+
+    partitionColName.map { name =>
+      dataFrame.filter(col(name).between(start, end)).show(lines, truncate)
+    }.getOrElse(dataFrame.show(lines, truncate))
   }
 
   /*
@@ -91,7 +100,7 @@ trait SparkApp extends Logging {
   def load(start: Date,
            end: Date,
            mode: SaveMode = SaveMode.Overwrite,
-           partColNames: Seq[String] = partitionColumnNames)(implicit spark: SparkSession): Unit = {
+           partColNames: Seq[String] = partitionColName.toSeq)(implicit spark: SparkSession): Unit = {
     logInfo(s"Loading data $name to ${path.toAbsolutePath.toString}")
     Try {
       val writer: DataFrameWriter[Row] = gen(start, end).write

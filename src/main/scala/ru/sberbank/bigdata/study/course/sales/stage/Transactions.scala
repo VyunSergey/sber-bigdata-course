@@ -9,7 +9,7 @@ import java.sql.Date
 
 object Transactions extends SparkApp {
   override val name: String = "transactions"
-  override val partitionColumnNames: Seq[String] = Seq("trans_dt")
+  override val partitionColName: Option[String] = Some("trans_dt")
 
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))
