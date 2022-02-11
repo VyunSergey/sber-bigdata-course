@@ -198,6 +198,10 @@ object SalesPoints extends SparkApp {
         col("sp1.terminal_id"),
         col("sp1.date"),
 
+        col("sp1.trans_sum"),
+        col("sp1.trans_count"),
+        (col("sp1.trans_sum") / col("sp1.trans_count")).cast(DecimalType(30, 15)).as("trans_avg"),
+
         col("sp1.trans_sum_male"),
         col("sp1.trans_sum_female"),
 
