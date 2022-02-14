@@ -17,6 +17,7 @@ object Main {
     val data: String = arguments.data()
     val countFlg: Boolean = arguments.countFlg()
     val showFlg: Boolean = arguments.showFlg()
+    val vizFlg: Boolean = arguments.vizFlg()
     val start: Date = arguments.startDate()
     val end: Date = arguments.endDate()
     val mode: SaveMode = arguments.mode()
@@ -24,7 +25,8 @@ object Main {
 
     if (countFlg) sparkApp.count(start, end)
     if (showFlg) sparkApp.show(start, end)
-    if (!countFlg && !showFlg) sparkApp.load(start, end, mode)
+    if (vizFlg) sparkApp.visualize(start, end, arguments.vizGroupColName.toOption, arguments.vizSumColName.toOption)
+    if (!countFlg && !showFlg && !vizFlg) sparkApp.load(start, end, mode)
   }
 
   val appMatcher: String => SparkApp = {

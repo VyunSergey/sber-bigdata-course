@@ -1,7 +1,7 @@
 package ru.sberbank.bigdata.study.course.sales.spark
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.{col, sum}
 import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SaveMode, SparkSession}
 import ru.sberbank.bigdata.study.course.sales.common.Configuration
 
@@ -59,6 +59,63 @@ trait SparkApp extends Logging {
     partitionColName.map { name =>
       dataFrame.filter(col(name).between(start, end)).show(lines, truncate)
     }.getOrElse(dataFrame.show(lines, truncate))
+  }
+
+  /*
+   *
+   * */
+  def visualize(start: Date = minStart,
+                end: Date = maxEnd,
+                groupColName: Option[String] = None,
+                sumColName: Option[String] = None,
+                limit: Int = 100)(implicit spark: SparkSession): Unit = {
+    import spark.implicits._
+
+    val dataFrame: DataFrame = Try {
+      get()
+    } getOrElse {
+      gen(start, end)
+    }
+
+    val dataFrameFiltered: DataFrame =
+      partitionColName.map { name =>
+        dataFrame.filter(col(name).between(start, end))
+      }.getOrElse(dataFrame)
+
+    (groupColName.orElse(partitionColName), sumColName) match {
+      case (Some(groupCol), Some(sumCol)) =>
+        SparkVisualisation.visualize(
+          colX = groupCol,
+          colY = s"sum of $sumCol",
+          limit = limit,
+          df = dataFrameFiltered
+            .groupBy(col(groupCol))
+            .agg(sum(col(sumCol)).as(s"sum of $sumCol"))
+        )
+      case (Some(groupCol), None) =>
+        SparkVisualisation.visualize(
+          colX = groupCol,
+          colY = "count",
+          limit = limit,
+          df = dataFrameFiltered
+            .groupBy(col(groupCol))
+            .count
+        )
+      case (None, Some(sumCol)) =>
+        SparkVisualisation.visualize(
+          colX = "data",
+          colY = s"sum of $sumCol",
+          limit = limit,
+          df = Seq(("data", dataFrameFiltered.select(sum(col(sumCol)).as(s"sum of $sumCol")))).toDF("data", s"sum of $sumCol")
+        )
+      case (None, None) =>
+        SparkVisualisation.visualize(
+          colX = "data",
+          colY = "count",
+          limit = limit,
+          df = Seq(("data", dataFrameFiltered.count)).toDF("data", "count")
+        )
+    }
   }
 
   /*

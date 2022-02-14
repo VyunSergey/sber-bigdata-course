@@ -22,13 +22,17 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
     "sales_locations"
   )
 
+  helpWidth(300)
   banner(s"""\nДобро пожаловать на курс BigData со Spark!
            |Надеюсь, Вам понравится, удачи!
-           |\nЗапуск: --data=<Название датасета> [--c] [--s] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
-           |Пример: --data=transactions --c --s --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
+           |\nЗапуск: --data=<Название датасета> [-c] [-s] [-v] [--viz-group-col=<Поле группировки>] [--viz-sum-col=<Поле суммирования>] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
+           |Пример: --data=transactions -c -s -v --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
            |  параметр --data необходимо указывать обязательно
            |  параметр --count можно не указывать, тогда возьмется значение 'false'
            |  параметр --show можно не указывать, тогда возьмется значение 'false'
+           |  параметр --viz можно не указывать, тогда возьмется значение 'false'
+           |  параметр --viz-group-col можно не указывать, тогда группировка будет по полю партиций, если оно есть
+           |  параметр --viz-sum-col можно не указывать, тогда будет считаться количество вместо суммы
            |  параметр --start-date можно не указывать, тогда возьмется значение '1900-01-01'
            |  параметр --end-date можно не указывать, тогда возьмется значение '5999-12-31'
            |  параметр --mode можно не указывать, тогда возьмется значение 'Overwrite'
@@ -71,9 +75,33 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
     default = Some(false)
   )
 
+  val vizFlg: ScallopOption[Boolean] = toggle(
+    name = "viz",
+    short = 'v',
+    descrYes = "Флаг визуализации данных в датасете",
+    required = false,
+    default = Some(false)
+  )
+
+  val vizGroupColName: ScallopOption[String] = opt[String](
+    name = "viz-group-col",
+    descr = "Название поля датасета для визуализации по которому будет группировка",
+    required = false,
+    default = None,
+    validate = _.nonEmpty
+  )
+
+  val vizSumColName: ScallopOption[String] = opt[String](
+    name = "viz-sum-col",
+    descr = "Название поля датасета для визуализации по которому будет суммирование",
+    required = false,
+    default = None,
+    validate = _.nonEmpty
+  )
+
   val startDate: ScallopOption[Date] = opt[String](
     name = "start-date",
-    descr = s"Бизнес дата начала периода расчета, по умолчанию: $None",
+    descr = "Бизнес дата начала периода расчета, по умолчанию: 1900-01-01",
     required = false,
     default = Some("1900-01-01"),
     validate = (str: String) => Try(Date.valueOf(str)).isSuccess
@@ -81,7 +109,7 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
 
   val endDate: ScallopOption[Date] = opt[String](
     name = "end-date",
-    descr = s"Бизнес дата конца периода расчета, по умолчанию: $None",
+    descr = "Бизнес дата конца периода расчета, по умолчанию: 5999-12-31",
     required = false,
     default = Some("5999-12-31"),
     validate = (str: String) => Try(Date.valueOf(str)).isSuccess
