@@ -10,6 +10,8 @@ import java.sql.Date
 import scala.util.{Failure, Success, Try}
 
 trait SparkApp extends Logging {
+  // TODO add descriptions to all methods
+
   /*
    *
    * */

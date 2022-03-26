@@ -4,6 +4,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.SparkSession
 
 object SparkConnection {
+  // TODO add descriptions to method `createLocalSession`
+  /*
+   *
+   * */
   def createLocalSession(numCores: Option[Int] = None,
                          appName: String = "spark-session"): SparkSession = {
     val settings: Map[String, String] = Map(

@@ -10,6 +10,11 @@ import java.sql.Date
 object Calendar extends SparkApp {
   override val name: String = "calendar"
   override val partitionColName: Option[String] = Some("date")
+
+  // TODO add descriptions to method `gen`
+  /*
+   *
+   * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))
       .filter(col("date").between(start, end))

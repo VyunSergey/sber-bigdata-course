@@ -14,6 +14,7 @@ object SalesPoints extends SparkApp {
   override val name: String = "sales_points"
   override val partitionColName: Option[String] = Some("date")
 
+  // TODO add descriptions to method `gen`
   /*
    *
    * */

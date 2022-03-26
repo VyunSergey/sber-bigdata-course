@@ -10,6 +10,10 @@ import java.sql.Date
 object Clients extends SparkApp {
   override val name: String = "clients"
 
+  // TODO add descriptions to method `gen`
+  /*
+   *
+   * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))
       .select(

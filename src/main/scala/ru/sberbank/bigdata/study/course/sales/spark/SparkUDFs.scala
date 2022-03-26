@@ -5,6 +5,10 @@ import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types.BooleanType
 
 object SparkUDFs extends Serializable {
+  // TODO add descriptions to method `coordinateNeighbours`
+  /*
+   *
+   * */
   val coordinateNeighbours: (java.math.BigDecimal, java.math.BigDecimal, java.math.BigDecimal, java.math.BigDecimal) => Boolean =
     (latX, lonX, latY, lonY) => {
       latX.add(latY.negate).abs.compareTo(new java.math.BigDecimal(0.01)) <= 0.0 &&

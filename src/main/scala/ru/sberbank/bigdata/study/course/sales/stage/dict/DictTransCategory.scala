@@ -9,6 +9,11 @@ import java.sql.Date
 
 object DictTransCategory extends SparkApp {
   override val name: String = "dict_trans_category"
+
+  // TODO add descriptions to method `gen`
+  /*
+   *
+   * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))
       .select(
