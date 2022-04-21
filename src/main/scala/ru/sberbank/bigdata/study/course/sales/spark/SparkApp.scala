@@ -10,20 +10,19 @@ import java.sql.Date
 import scala.util.{Failure, Success, Try}
 
 trait SparkApp extends Logging {
-  // TODO add descriptions to all methods
 
   /*
-   *
+   * Название датасета
    * */
   val name: String
 
   /*
-   *
+   * Опционально название поля партицирования данных
    * */
   val partitionColName: Option[String] = None
 
   /*
-   *
+   * Путь хранения данных в файловой системе
    * */
   def path: Path = {
     val rp = rootPath(name)
@@ -31,7 +30,7 @@ trait SparkApp extends Logging {
   }
 
   /*
-   *
+   * Метод подсчета количества данных
    * */
   def count(start: Date = minStart, end: Date = maxEnd)(implicit spark: SparkSession): Long = {
     val dataFrame: DataFrame = Try {
@@ -49,7 +48,8 @@ trait SparkApp extends Logging {
   }
 
   /*
-   *
+   * Метод вывода в консоль примера данных
+   * По умолчанию выводится 20 строк
    * */
   def show(start: Date = minStart, end: Date = maxEnd, lines: Int = 20, truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
     val dataFrame: DataFrame = Try {
@@ -64,7 +64,11 @@ trait SparkApp extends Logging {
   }
 
   /*
-   *
+   * Метод визуализации данных с помощью графиков
+   * Можно считать количество строк или сумму по полю `sumColName` в разрезе поля `groupColName`
+   * По умолчанию считается количество без разреза
+   * Если задать поле `sumColName` то по нему будет считаться сумма
+   * Если задать поле `groupColName` то в разрезе него будет происходить расчет
    * */
   def visualize(start: Date = minStart,
                 end: Date = maxEnd,
@@ -121,12 +125,13 @@ trait SparkApp extends Logging {
   }
 
   /*
-   *
+   * Метод расчета данных
+   * Содержит всю логику преобразования и обработки данных
    * */
   def gen(start: Date = minStart, end: Date = maxEnd)(implicit spark: SparkSession): DataFrame
 
   /*
-   *
+   * Метод получения данных по имени `name` или пути `path`
    * */
   def get(name: String = name, path: Path = path)(implicit spark: SparkSession): DataFrame = {
     logInfo(s"Getting data $name from ${path.toAbsolutePath.toString}")
@@ -154,7 +159,13 @@ trait SparkApp extends Logging {
   }
 
   /*
-   *
+   * Метод сохранения рассчитанных данных по пути `path` в файловой системе
+   * Поддерживается несколько режимов сохранения:
+   * SaveMode.Append - добавить данные к уже имеющимся
+   * SaveMode.Overwrite - перезаписать данные
+   * SaveMode.ErrorIfExists - прекратить работу с ошибкой, если уже что-то имеется
+   * SaveMode.Ignore - не записывать новые данные, если уже что-то имеется
+   * По умолчанию используется режим SaveMode.Overwrite т.е. данные перезаписываются
    * */
   def load(start: Date,
            end: Date,
