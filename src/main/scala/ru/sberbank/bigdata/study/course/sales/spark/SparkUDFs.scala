@@ -5,8 +5,21 @@ import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.types.BooleanType
 
 object SparkUDFs extends Serializable {
-  // TODO add descriptions to method `coordinateNeighbours`
+
   /*
+   * UDF(User Defined Function) - функция определения соседей по стороне квадрата по заданным координатам
+   * X - координаты (`latX`, `lonX`) левого нижнего угла заданного квадрата
+   * Y - координаты (`latY`, `lonY`) левого нижнего угла соседних квадратов
+   * #====#====#====#
+   * |    |    |    |
+   * |    |    |    |
+   * Y====Y====Y====#
+   * |    |****|    |
+   * |    |****|    |
+   * Y====X====Y====#
+   * |    |    |    |
+   * |    |    |    |
+   * Y====Y====Y====#
    *
    * */
   val coordinateNeighbours: (java.math.BigDecimal, java.math.BigDecimal, java.math.BigDecimal, java.math.BigDecimal) => Boolean =
