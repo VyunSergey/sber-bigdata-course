@@ -11,9 +11,10 @@ object SalesLocations extends SparkApp {
   override val name: String = "sales_locations"
   override val partitionColName: Option[String] = Some("date")
 
-  // TODO add descriptions to method `gen`
   /*
-   *
+   * Логика расчета датасета `SalesLocations` к которому добавляются дополнительные признаки от датасета `SalesPoints`
+   * сумма, количество и средняя сумма транзакций в разрезе квадрата со всеми терминалами, полученными округлением координат 2 знаках после плавающей точки
+   * сумма, количество и средняя сумма транзакций в разрезе всех соседних квадратов относительно данного
    * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     val salesPoints: DataFrame = SalesPoints.get()
