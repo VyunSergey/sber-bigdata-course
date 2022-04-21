@@ -21,10 +21,14 @@
 * Среда разработки `IntelliJ IDEA Community (Windows)` по [инструкции](/readme/GUIDE_IntelliJ_IDEA.md)
 * Фреймворк `Apache Spark` по [инструкции](/readme/GUIDE_Apache_Spark.md)
 
+## Постановка задачи
+
+На основе имеющихся данных о транзакциях клиентов в терминалах необходимо понять в каких локациях торговых точек эффективнее всего по сумме и количеству идут продажи в определенные периоды времени и научиться предсказывать эти локации торговых точек для будущих периодов. 
+
 ## Flowchart потоков данных 
 
 ```mermaid
-%%{config: { width: 200 }%%
+%%{config: { 'width': 200 }}%%
 flowchart TB
   subgraph STAGE
     direction TB
@@ -64,4 +68,47 @@ flowchart TB
   
   style sp fill:#20603d,stroke:#54ff9f,stroke-width:1px,color:#fff
   style sl fill:#20603d,stroke:#54ff9f,stroke-width:1px,color:#fff
+```
+
+## Модель данных
+
+```mermaid
+%%{init: {'theme': 'base' }}%%
+classDiagram
+  class Clients {
+    cid: String
+    gender: Integer
+    age_group: Integer
+    okrug_num: Integer
+    region_code: Integer
+  }
+  class Terminals {
+    tid: String
+    latitude: Double
+    longitude: Double
+    okrug_mt_num: Integer
+    region_id: Integer
+    internet_flag: Integer
+    category: Integer
+  }
+  class Calendar {
+    date: Date
+    description: String
+  }
+  class Transactions {
+    trans_id: String
+    cid: String
+    tid: String
+    trans_dt: Date
+    trans_time: String
+    trans_sum: Double
+    trans_success: String
+    category: Integer
+    day_of_week: String
+    country: String
+    return: String
+  }
+  Clients <|--|> Transactions
+  Terminals <|--|> Transactions
+  Calendar <|--|> Transactions
 ```
