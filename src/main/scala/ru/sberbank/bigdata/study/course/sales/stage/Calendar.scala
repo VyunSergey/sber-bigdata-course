@@ -11,9 +11,13 @@ object Calendar extends SparkApp {
   override val name: String = "calendar"
   override val partitionColName: Option[String] = Some("date")
 
-  // TODO add descriptions to method `gen`
   /*
-   *
+   * Логика обработки датасета `Calendar` с разметкой календарных дней:
+   *  `date` - календарный день
+   *  `description` - категория дня
+   *    РАБОЧИЙ ДЕНЬ
+   *    ПРАЗДНИЧНЫЙ ДЕНЬ
+   *    ВЫХОДНОЙ
    * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))

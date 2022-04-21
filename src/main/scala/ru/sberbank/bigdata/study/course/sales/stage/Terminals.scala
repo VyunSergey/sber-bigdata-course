@@ -10,9 +10,14 @@ import java.sql.Date
 object Terminals extends SparkApp {
   override val name: String = "terminals"
 
-  // TODO add descriptions to method `gen`
   /*
-   *
+   * Логика обработки датасета `Terminals` с терминалами,в которых клиенты совершают транзакции
+   * Терминалы имеют следующие признаки:
+   *  `tid` - уникальный id терминала
+   *  `latitude` - широта географических координат расположения терминала
+   *  `longitude` - долгота географических координат расположения терминала
+   *  `internet_flag` - признак on-line терминала
+   *  `category` - категория терминала
    * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))

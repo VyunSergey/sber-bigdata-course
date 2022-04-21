@@ -11,9 +11,33 @@ object Transactions extends SparkApp {
   override val name: String = "transactions"
   override val partitionColName: Option[String] = Some("trans_dt")
 
-  // TODO add descriptions to method `gen`
   /*
-   *
+   * Логика обработки датасета `Transactions` с транзакциями, которые совершают клиенты в терминалах
+   * Транзакции имеют следующие признаки:
+   *  `trans_id` - уникальный id транзакции
+   *  `trans_dt` - дата совершения транзакции
+   *  `trans_time` - время совершения транзакции
+   *  `trans_sum` - сумма транзакции
+   *  `trans_success` - признак успешно совершенной транзакции
+   *  `category` - категория транзакции
+   *    1 - Всё для дома
+   *    2 - Всё остальное
+   *    3 - Денежные переводы
+   *    4 - Дети и животные
+   *    5 - Интернет-магазины
+   *    6 - Личный транспорт
+   *    7 - Медицина и косметика
+   *    8 - Общепит
+   *    9 - Одежда, обувь и аксессуары
+   *   10 - Оплата счетов
+   *   11 - Поездки, доставка, хранение
+   *   12 - Супермаркеты и продуктовые магазины
+   *   13 - Телефония и интернет
+   *  `cid` - уникальный id клиента
+   *  `tid` - уникальный id терминала
+   *  `day_of_week` - день недели у даты совершения транзакции
+   *  `country` - страна совершения транзакции
+   *  `return` - признак возврата денег по транзакции
    * */
   override def gen(start: Date, end: Date)(implicit spark: SparkSession): DataFrame = {
     get(path = path.getParent.getParent.resolve("src").resolve(name))
