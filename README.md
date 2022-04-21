@@ -4,4 +4,64 @@
 [![Last commit](https://img.shields.io/github/last-commit/VyunSergey/sber-bigdata-course)]()
 [![Contributors](https://img.shields.io/github/contributors/VyunSergey/sber-bigdata-course)]()
 
-# Sber BigData Course
+![Sber logo](readme/images/logo/logo.png)
+
+# РАЗРАБОТКА BIG DATA ПРОДУКТОВ
+
+Данный проект предназначен для практического занятия по курсу BIG DATA от Сбер Аналитики. В рамках занятия вы научитесь:
+* Преобразовывать разрозненные неструктурированные данные в ценные сведения для бизнеса
+* Визуализировать полученные сведения
+* Проверять гипотезы и делать выводы основываясь на данных
+* Работать с фреймворком `Apache Spark`
+
+## Инструкция по настройке окружения
+
+Для работы с данным проектом Вам понадобиться установить на рабочий компьютер или ноутбук следующее программное обеспечение:
+* `Java Development Kit (JDK)` по [инструкции](/readme/GUIDE_Java_JDK.md)
+* Среда разработки `IntelliJ IDEA Community (Windows)` по [инструкции](/readme/GUIDE_IntelliJ_IDEA.md)
+* Фреймворк `Apache Spark` по [инструкции](/readme/GUIDE_Apache_Spark.md)
+
+## Flowchart потоков данных 
+
+```mermaid
+%%{config: { width: 200 }%%
+flowchart TB
+  subgraph STAGE
+    direction TB
+    cl1("fa:fa-twitter Clients")
+    trm1("fa:fa-twitter Terminals")
+    trn1("fa:fa-twitter Transactions")
+    cld1("fa:fa-twitter Calendar")
+  end
+  subgraph STORE
+    direction TB
+    cl2("fa:fa-twitter Clients")
+    trm2("fa:fa-twitter Terminals")
+    trn2("fa:fa-twitter Transactions")
+    cld2("fa:fa-twitter Calendar")
+    sp("fa:fa-twitter Sales Points")
+    sl("fa:fa-twitter Sales Locations")
+    cl2 --> sp
+    trm2 --> sp
+    trn2 --> sp
+    cld2 --> sp
+    sp --> sl
+  end
+  STAGE --> STORE
+
+  style STAGE fill:#4c5866,stroke:#9aa5b3,stroke-width:1px,color:#fff
+  style STORE fill:#4c5866,stroke:#9aa5b3,stroke-width:1px,color:#fff
+
+  style cl1 fill:#b57900,stroke:#ffcc00,stroke-width:1px,color:#fff
+  style trm1 fill:#b57900,stroke:#ffcc00,stroke-width:1px,color:#fff
+  style trn1 fill:#b57900,stroke:#ffcc00,stroke-width:1px,color:#fff
+  style cld1 fill:#b57900,stroke:#ffcc00,stroke-width:1px,color:#fff
+
+  style cl2 fill:#182f6e,stroke:#33ccff,stroke-width:1px,color:#fff
+  style trm2 fill:#182f6e,stroke:#33ccff,stroke-width:1px,color:#fff
+  style trn2 fill:#182f6e,stroke:#33ccff,stroke-width:1px,color:#fff
+  style cld2 fill:#182f6e,stroke:#33ccff,stroke-width:1px,color:#fff
+  
+  style sp fill:#20603d,stroke:#54ff9f,stroke-width:1px,color:#fff
+  style sl fill:#20603d,stroke:#54ff9f,stroke-width:1px,color:#fff
+```
