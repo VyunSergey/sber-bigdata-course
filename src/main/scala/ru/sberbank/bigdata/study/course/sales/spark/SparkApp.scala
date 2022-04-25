@@ -2,6 +2,7 @@ package ru.sberbank.bigdata.study.course.sales.spark
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.functions.{col, sum}
+import org.apache.spark.sql.types.DecimalType
 import org.apache.spark.sql.{DataFrame, DataFrameWriter, Row, SaveMode, SparkSession}
 import ru.sberbank.bigdata.study.course.sales.common.Configuration
 
@@ -49,18 +50,48 @@ trait SparkApp extends Logging {
 
   /*
    * Метод вывода в консоль примера данных
+   * Можно считать количество строк или сумму по полю `sumColName` в разрезе поля `groupColName`
    * По умолчанию выводится 20 строк
+   * Если задать поле `sumColName` то по нему будет считаться сумма
+   * Если задать поле `groupColName` то в разрезе него будет происходить расчет
    * */
-  def show(start: Date = minStart, end: Date = maxEnd, lines: Int = 20, truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
+  def show(start: Date = minStart,
+           end: Date = maxEnd,
+           groupColName: Option[String] = None,
+           sumColName: Option[String] = None,
+           lines: Int = 20,
+           truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
     val dataFrame: DataFrame = Try {
       get()
     } getOrElse {
       gen(start, end)
     }
 
-    partitionColName.map { name =>
-      dataFrame.filter(col(name).between(start, end)).show(lines, truncate)
-    }.getOrElse(dataFrame.show(lines, truncate))
+    val dataFrameFiltered: DataFrame =
+      partitionColName.map { name =>
+        dataFrame.filter(col(name).between(start, end))
+      }.getOrElse(dataFrame)
+
+    (groupColName, sumColName) match {
+      case (Some(groupCol), Some(sumCol)) =>
+        dataFrameFiltered
+          .groupBy(col(groupCol))
+          .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
+          .orderBy(col(groupCol))
+          .show(lines, truncate)
+      case (Some(groupCol), None) =>
+        dataFrameFiltered
+          .groupBy(col(groupCol))
+          .count
+          .orderBy(col(groupCol))
+          .show(lines, truncate)
+      case (None, Some(sumCol)) =>
+        dataFrameFiltered
+          .select(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
+          .show(lines, truncate)
+      case (None, None) =>
+        dataFrameFiltered.show(lines, truncate)
+    }
   }
 
   /*
@@ -96,7 +127,7 @@ trait SparkApp extends Logging {
           limit = limit,
           df = dataFrameFiltered
             .groupBy(col(groupCol))
-            .agg(sum(col(sumCol)).as(s"sum of $sumCol"))
+            .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
         )
       case (Some(groupCol), None) =>
         SparkVisualisation.visualize(
@@ -112,7 +143,9 @@ trait SparkApp extends Logging {
           colX = "data",
           colY = s"sum of $sumCol",
           limit = limit,
-          df = Seq(("data", dataFrameFiltered.select(sum(col(sumCol)).as(s"sum of $sumCol")))).toDF("data", s"sum of $sumCol")
+          df = Seq(("data", dataFrameFiltered
+            .select(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol")))
+          ).toDF("data", s"sum of $sumCol")
         )
       case (None, None) =>
         SparkVisualisation.visualize(

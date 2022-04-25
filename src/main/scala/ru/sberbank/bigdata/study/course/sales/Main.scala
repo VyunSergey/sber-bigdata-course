@@ -24,7 +24,7 @@ object Main {
     val sparkApp: SparkApp = appMatcher(data)
 
     if (countFlg) sparkApp.count(start, end)
-    if (showFlg) sparkApp.show(start, end)
+    if (showFlg) sparkApp.show(start, end, arguments.vizGroupColName.toOption, arguments.vizSumColName.toOption)
     if (vizFlg) sparkApp.visualize(start, end, arguments.vizGroupColName.toOption, arguments.vizSumColName.toOption)
     if (!countFlg && !showFlg && !vizFlg) sparkApp.load(start, end, mode)
   }
