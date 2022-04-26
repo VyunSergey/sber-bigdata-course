@@ -57,7 +57,7 @@ trait SparkApp extends Logging {
    * */
   def show(start: Date = minStart,
            end: Date = maxEnd,
-           groupColName: Option[String] = None,
+           groupColNameList: List[String] = Nil,
            sumColName: Option[String] = None,
            lines: Int = 30,
            truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
@@ -72,24 +72,24 @@ trait SparkApp extends Logging {
         dataFrame.filter(col(name).between(start, end))
       }.getOrElse(dataFrame)
 
-    (groupColName, sumColName) match {
-      case (Some(groupCol), Some(sumCol)) =>
+    (groupColNameList, sumColName) match {
+      case (head :: tail, Some(sumCol)) =>
         dataFrameFiltered
-          .groupBy(col(groupCol))
+          .groupBy((head :: tail).map(col): _*)
           .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
           .orderBy(col(s"sum of $sumCol").desc)
           .show(lines, truncate)
-      case (Some(groupCol), None) =>
+      case (head :: tail, None) =>
         dataFrameFiltered
-          .groupBy(col(groupCol))
+          .groupBy((head :: tail).map(col): _*)
           .count
           .orderBy(col("count").desc)
           .show(lines, truncate)
-      case (None, Some(sumCol)) =>
+      case (Nil, Some(sumCol)) =>
         dataFrameFiltered
           .select(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
           .show(lines, truncate)
-      case (None, None) =>
+      case (Nil, None) =>
         dataFrameFiltered.show(lines, truncate)
     }
   }
@@ -103,7 +103,7 @@ trait SparkApp extends Logging {
    * */
   def visualize(start: Date = minStart,
                 end: Date = maxEnd,
-                groupColName: Option[String] = None,
+                groupColNameList: List[String] = Nil,
                 sumColName: Option[String] = None,
                 limit: Int = 100)(implicit spark: SparkSession): Unit = {
     import spark.implicits._
@@ -119,28 +119,28 @@ trait SparkApp extends Logging {
         dataFrame.filter(col(name).between(start, end))
       }.getOrElse(dataFrame)
 
-    (groupColName.orElse(partitionColName), sumColName) match {
-      case (Some(groupCol), Some(sumCol)) =>
+    (groupColNameList, sumColName) match {
+      case (head :: _, Some(sumCol)) =>
         SparkVisualisation.visualize(
-          colX = groupCol,
+          colX = head,
           colY = s"sum of $sumCol",
           limit = limit,
           df = dataFrameFiltered
-            .groupBy(col(groupCol))
+            .groupBy(col(head))
             .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
             .orderBy(col(s"sum of $sumCol").desc)
         )
-      case (Some(groupCol), None) =>
+      case (head :: _, None) =>
         SparkVisualisation.visualize(
-          colX = groupCol,
+          colX = head,
           colY = "count",
           limit = limit,
           df = dataFrameFiltered
-            .groupBy(col(groupCol))
+            .groupBy(col(head))
             .count
             .orderBy(col("count").desc)
         )
-      case (None, Some(sumCol)) =>
+      case (Nil, Some(sumCol)) =>
         SparkVisualisation.visualize(
           colX = "data",
           colY = s"sum of $sumCol",
@@ -149,7 +149,7 @@ trait SparkApp extends Logging {
             .select(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol")))
           ).toDF("data", s"sum of $sumCol")
         )
-      case (None, None) =>
+      case (Nil, None) =>
         SparkVisualisation.visualize(
           colX = "data",
           colY = "count",

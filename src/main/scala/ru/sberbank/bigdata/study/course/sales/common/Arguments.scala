@@ -25,13 +25,13 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
   helpWidth(300)
   banner(s"""\nДобро пожаловать на курс BigData со Spark!
            |Надеюсь, Вам понравится, удачи!
-           |\nЗапуск: --data=<Название датасета> [-c] [-s] [-v] [--viz-group-col=<Поле группировки>] [--viz-sum-col=<Поле суммирования>] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
+           |\nЗапуск: --data=<Название датасета> [-c] [-s] [-v] [--viz-group-col=<Список полей группировки через ','>] [--viz-sum-col=<Поле суммирования>] [--start-date=<Дата начала>] [--end-date=<Дата конца>] [--mode=<Режим расчета>]
            |Пример: --data=transactions -c -s -v --start-date=2021-06-01 --end-date=2021-06-05 --mode=Append
            |  параметр --data необходимо указывать обязательно
            |  параметр --count можно не указывать, тогда возьмется значение 'false'
            |  параметр --show можно не указывать, тогда возьмется значение 'false'
            |  параметр --viz можно не указывать, тогда возьмется значение 'false'
-           |  параметр --viz-group-col можно не указывать, тогда группировка будет по полю партиций, если оно есть
+           |  параметр --viz-group-col можно не указывать, тогда группировки не будет
            |  параметр --viz-sum-col можно не указывать, тогда будет считаться количество вместо суммы
            |  параметр --start-date можно не указывать, тогда возьмется значение '1900-01-01'
            |  параметр --end-date можно не указывать, тогда возьмется значение '5999-12-31'
@@ -83,13 +83,13 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
     default = Some(false)
   )
 
-  val vizGroupColName: ScallopOption[String] = opt[String](
+  val vizGroupColNameList: ScallopOption[List[String]] = opt[String](
     name = "viz-group-col",
-    descr = "Название поля датасета для визуализации по которому будет группировка",
+    descr = "Список полей датасета через запятую для визуализации по которым будет группировка",
     required = false,
     default = None,
     validate = _.nonEmpty
-  )
+  ).map(_.split(",").toList)
 
   val vizSumColName: ScallopOption[String] = opt[String](
     name = "viz-sum-col",
