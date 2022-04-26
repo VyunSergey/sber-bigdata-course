@@ -21,10 +21,11 @@ object Main {
     val start: Date = arguments.startDate()
     val end: Date = arguments.endDate()
     val mode: SaveMode = arguments.mode()
+    val num: Int = arguments.num()
     val sparkApp: SparkApp = appMatcher(data)
 
     if (countFlg) sparkApp.count(start, end)
-    if (showFlg) sparkApp.show(start, end, arguments.vizGroupColNameList.getOrElse(Nil), arguments.vizSumColName.toOption)
+    if (showFlg) sparkApp.show(start, end, arguments.vizGroupColNameList.getOrElse(Nil), arguments.vizSumColName.toOption, num)
     if (vizFlg) sparkApp.visualize(start, end, arguments.vizGroupColNameList.getOrElse(Nil), arguments.vizSumColName.toOption)
     if (!countFlg && !showFlg && !vizFlg) sparkApp.load(start, end, mode)
   }

@@ -90,7 +90,8 @@ trait SparkApp extends Logging {
           .select(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
           .show(lines, truncate)
       case (Nil, None) =>
-        dataFrameFiltered.show(lines, truncate)
+        dataFrameFiltered
+          .show(lines, truncate)
     }
   }
 

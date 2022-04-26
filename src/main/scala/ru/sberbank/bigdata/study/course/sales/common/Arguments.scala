@@ -124,5 +124,13 @@ case class Arguments(arguments: Seq[String]) extends ScallopConf(arguments) {
     validate = SaveMode.values.map(_.name).contains
   ).map(SaveMode.valueOf)
 
+  val num: ScallopOption[Int] = opt[Int](
+    name = "num",
+    descr = "Количество строк для вывода в консоль в примере данных",
+    required = false,
+    default = Some(30),
+    validate = _ > 0
+  )
+
   verify()
 }
