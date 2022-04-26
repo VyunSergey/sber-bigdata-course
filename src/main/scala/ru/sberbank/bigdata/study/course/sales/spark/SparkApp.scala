@@ -51,7 +51,7 @@ trait SparkApp extends Logging {
   /*
    * Метод вывода в консоль примера данных
    * Можно считать количество строк или сумму по полю `sumColName` в разрезе поля `groupColName`
-   * По умолчанию выводится 20 строк
+   * По умолчанию выводится 30 строк
    * Если задать поле `sumColName` то по нему будет считаться сумма
    * Если задать поле `groupColName` то в разрезе него будет происходить расчет
    * */
@@ -59,7 +59,7 @@ trait SparkApp extends Logging {
            end: Date = maxEnd,
            groupColName: Option[String] = None,
            sumColName: Option[String] = None,
-           lines: Int = 20,
+           lines: Int = 30,
            truncate: Boolean = false)(implicit spark: SparkSession): Unit = {
     val dataFrame: DataFrame = Try {
       get()
