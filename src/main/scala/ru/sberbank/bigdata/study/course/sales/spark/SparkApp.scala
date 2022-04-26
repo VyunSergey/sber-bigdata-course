@@ -77,13 +77,13 @@ trait SparkApp extends Logging {
         dataFrameFiltered
           .groupBy(col(groupCol))
           .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
-          .orderBy(col(groupCol))
+          .orderBy(col(s"sum of $sumCol").desc)
           .show(lines, truncate)
       case (Some(groupCol), None) =>
         dataFrameFiltered
           .groupBy(col(groupCol))
           .count
-          .orderBy(col(groupCol))
+          .orderBy(col("count").desc)
           .show(lines, truncate)
       case (None, Some(sumCol)) =>
         dataFrameFiltered
@@ -128,6 +128,7 @@ trait SparkApp extends Logging {
           df = dataFrameFiltered
             .groupBy(col(groupCol))
             .agg(sum(col(sumCol)).cast(DecimalType(38, 10)).as(s"sum of $sumCol"))
+            .orderBy(col(s"sum of $sumCol").desc)
         )
       case (Some(groupCol), None) =>
         SparkVisualisation.visualize(
@@ -137,6 +138,7 @@ trait SparkApp extends Logging {
           df = dataFrameFiltered
             .groupBy(col(groupCol))
             .count
+            .orderBy(col("count").desc)
         )
       case (None, Some(sumCol)) =>
         SparkVisualisation.visualize(
